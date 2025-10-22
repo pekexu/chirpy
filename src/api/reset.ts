@@ -6,5 +6,5 @@ export async function handlerReset(req: Request, res: Response, next: NextFuncti
     res.set(
     "Content-Type", "text/plain; charset=utf-8"
     );
-    res.send("OK");
+    res.send("Resetting stats...");
 }
