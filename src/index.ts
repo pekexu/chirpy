@@ -9,7 +9,7 @@ import { handlerValidateChirp } from "./api/validatechirp.js";
 const app = express();
 const PORT = 8080;
 
-
+app.use(express.json());
 app.use(middlewareLogResponses);
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.get("/api/healthz", handlerReadiness);
