@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { BadRequestError, respondWithJSON } from "./errorhandler.js";
 
 
 
@@ -11,22 +12,13 @@ export async function handlerValidateChirp(req: Request, res: Response): Promise
 
         const maxChirpLength = 140;
         if (params.body.length > maxChirpLength) {
-            throw new Error("Something went wrong on our end is fine for now.");
+            throw new BadRequestError(`Chirp is too long. Max length is ${maxChirpLength}`);
             
         }
         respondWithJSON(res, 200, { cleanedBody: cleanBody(params.body),});
     
 }
 
-export function respondWithError(res: Response, code: number, message: string) {
-  respondWithJSON(res, code, { error: message });
-}
-
-export function respondWithJSON(res: Response, code: number, payload: any) {
-  res.header("Content-Type", "application/json");
-  const body = JSON.stringify(payload);
-  res.status(code).send(body);
-}
 
 export function cleanBody(body: string): string{
     const badwords = ["kerfuffle", "sharbert", "fornax"];
