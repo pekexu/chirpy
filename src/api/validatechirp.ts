@@ -11,8 +11,8 @@ export async function handlerValidateChirp(req: Request, res: Response): Promise
 
         const maxChirpLength = 140;
         if (params.body.length > maxChirpLength) {
-            respondWithError(res, 400, "Chirp is too long");
-            return;
+            throw new Error("Something went wrong on our end is fine for now.");
+            
         }
         respondWithJSON(res, 200, { cleanedBody: cleanBody(params.body),});
     
