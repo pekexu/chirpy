@@ -29,20 +29,21 @@ export function respondWithJSON(res: Response, code: number, payload: any) {
 }
 
 export function cleanBody(body: string): string{
-    
     const badwords = ["kerfuffle", "sharbert", "fornax"];
-
     for (const word of badwords){
         if (body.toLowerCase().includes(word)){
-            return cleanHelp(body, word);
+            body = cleanHelp(body, word);
         }
     }
-
     return body;
 }
 
-
 function cleanHelp(body: string, word: string): string{
-    const arrays = body.toLowerCase().split(word);
-    return arrays.join("****");
+    const array = body.split(" ");
+    for (let i = 0; i < array.length; i++){
+        if(array[i].toLowerCase() === word){
+            array[i] = "****";
+        }
+    }
+    return array.join(" ");
 }
