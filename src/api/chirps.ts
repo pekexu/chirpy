@@ -2,12 +2,23 @@ import { Request, Response } from "express";
 import { BadRequestError, respondWithJSON } from "./errorhandler.js";
 import { db } from "../db/index.js";
 import { chirps, NewChirp } from "../db/schema.js";
+import { eq } from "drizzle-orm";
 
 
 export async function handlerGetAllChirps(req: Request, res: Response): Promise<void>{
     const allChirps = await db.select().from(chirps).orderBy(chirps.createdAt);
     respondWithJSON(res, 200, allChirps);
 }
+
+export async function handlerGetChirps(req: Request, res: Response): Promise<void>{
+    const chirpId = req.params.chirpID;
+    if (!chirpId){
+        throw new BadRequestError("Invalid Chirp ID");
+    }
+    const [aChirp] = await db.select().from(chirps).where(eq(chirps.id, chirpId));
+    respondWithJSON(res, 200, aChirp);
+}
+
 
 export async function postChirp(body: string, userId: string): Promise<NewChirp>{
     
