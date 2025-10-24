@@ -4,8 +4,13 @@ import { db } from "../db/index.js";
 import { chirps, NewChirp } from "../db/schema.js";
 
 
+export async function handlerGetAllChirps(req: Request, res: Response): Promise<void>{
+    const allChirps = await db.select().from(chirps).orderBy(chirps.createdAt);
+    respondWithJSON(res, 200, allChirps);
+}
+
 export async function postChirp(body: string, userId: string): Promise<NewChirp>{
-    console.log("Creating new chirp");
+    
     const [newChirp] = await db.insert(chirps).values({body: body, userId: userId}).returning();
     return newChirp;
 }
@@ -28,7 +33,7 @@ export async function handlerValidateChirp(req: Request, res: Response): Promise
     if (!newChirp){
         throw new BadRequestError("Something went wrong in creating chirp");
     }
-    console.log(newChirp);
+    
     respondWithJSON(res, 201, newChirp);
 }
 
