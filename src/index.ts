@@ -3,7 +3,7 @@ import { handlerReadiness } from "./api/readiness.js";
 import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReset } from "./api/reset.js";
-import { handlerValidateChirp } from "./api/validatechirp.js";
+import { handlerValidateChirp} from "./api/chirps.js";
 import { errorMiddleware } from "./api/errorhandler.js";
 
 import postgres from "postgres";
@@ -33,13 +33,14 @@ app.post("/admin/reset", (req, res, next) => {
   Promise.resolve(handlerReset(req, res)).catch(next);
 });
 
-app.post("/api/validate_chirp", (req, res, next) => {
-  Promise.resolve(handlerValidateChirp(req, res)).catch(next);
-});
-
 app.post("/api/users", (req, res, next) => {
   Promise.resolve(handlerCreateUser(req, res)).catch(next);
 })
+
+app.post("/api/chirps", (req, res, next) => {
+  Promise.resolve(handlerValidateChirp(req, res)).catch(next);
+});
+
 
 
 app.use(errorMiddleware);
