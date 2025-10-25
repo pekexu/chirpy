@@ -15,6 +15,13 @@
       "when": 1761301348301,
       "tag": "0001_overrated_norrin_radd",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761415264688,
+      "tag": "0002_bumpy_zuras",
+      "breakpoints": true
     }
   ]
 }
