@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
-import { BadRequestError, respondWithJSON } from "./errorhandler.js";
+import { BadRequestError, respondWithJSON, UnauthorizedError } from "./errorhandler.js";
 import { db } from "../db/index.js";
-import { chirps, NewChirp } from "../db/schema.js";
+import { chirps, NewChirp, users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
+import { getBearerToken, hashPassword, validateJWT } from "./auth.js";
+import { config } from "../config.js";
 
 
 export async function handlerGetAllChirps(req: Request, res: Response): Promise<void>{
@@ -32,15 +34,17 @@ export async function handlerValidateChirp(req: Request, res: Response): Promise
         userId: string;
     };
     let params: parameters = req.body;
+    const token = getBearerToken(req);
 
+    const validUser = validateJWT(token, config.secret);
     const maxChirpLength = 140;
     if (params.body.length > maxChirpLength) {
         throw new BadRequestError(`Chirp is too long. Max length is ${maxChirpLength}`);            
     }
-    if (!params.userId){
+    if (!validUser){
         throw new BadRequestError("Invalid or no username");
     }
-    const newChirp = await postChirp(cleanBody(params.body), params.userId);
+    const newChirp = await postChirp(cleanBody(params.body), validUser);
     if (!newChirp){
         throw new BadRequestError("Something went wrong in creating chirp");
     }

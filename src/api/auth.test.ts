@@ -17,6 +17,26 @@ describe("Password Hashing", () => {
     const result = await checkPasswordHash(password1, hash1);
     expect(result).toBe(true);
   });
+
+  it("should return false for an incorrect password", async () => {
+    const result = await checkPasswordHash("wrongPassword", hash1);
+    expect(result).toBe(false);
+  });
+
+  it("should return false when password doesn't match a different hash", async () => {
+    const result = await checkPasswordHash(password1, hash2);
+    expect(result).toBe(false);
+  });
+
+  it("should return false for an empty password", async () => {
+    const result = await checkPasswordHash("", hash1);
+    expect(result).toBe(false);
+  });
+
+  it("should return false for an invalid hash", async () => {
+    const result = await checkPasswordHash(password1, "invalidhash");
+    expect(result).toBe(false);
+  });
 });
 
 describe("JWT Functions", () => {
@@ -46,3 +66,4 @@ describe("JWT Functions", () => {
     );
   });
 });
+
