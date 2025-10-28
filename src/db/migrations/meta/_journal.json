@@ -22,6 +22,20 @@
       "when": 1761415264688,
       "tag": "0002_bumpy_zuras",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761648352134,
+      "tag": "0003_fancy_queen_noir",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761652423511,
+      "tag": "0004_petite_sprite",
+      "breakpoints": true
     }
   ]
 }

@@ -11,7 +11,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
 import { handlerCreateUser } from "./db/queries/users.js";
-import { handlerUserLogin } from "./api/auth.js";
+import { handlerRefresh, handlerRevoke, handlerUserLogin } from "./api/auth.js";
 
 
 const migrationClient = postgres(config.db.url, { max: 1 });
@@ -54,6 +54,14 @@ app.post("/api/chirps", (req, res, next) => {
 app.post("/api/login", (req, res, next) => {
   Promise.resolve(handlerUserLogin(req,res)).catch(next);
 });
+
+app.post("/api/refresh", (req, res, next) => {
+  Promise.resolve(handlerRefresh(req,res)).catch(next);
+})
+
+app.post("/api/revoke", (req, res, next) => {
+  Promise.resolve(handlerRevoke(req, res)).catch(next);
+})
 
 
 
