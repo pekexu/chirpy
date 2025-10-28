@@ -4,7 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { BadRequestError, respondWithJSON, UnauthorizedError } from "./errorhandler.js";
 import { Request, Response } from "express";
 import { db } from "../db/index.js";
-import {  RefreshToken, refreshTokens, users } from "../db/schema.js";
+import {  RefreshToken, refreshTokens, UserResponse, users } from "../db/schema.js";
 import { eq,  } from "drizzle-orm";
 import { config } from "../config.js";
 import { randomBytes } from "crypto";
@@ -159,4 +159,29 @@ export async function handlerRevoke(req: Request, res: Response){
 
   const [dbToken] = await db.update(refreshTokens).set({revokedAt: new Date()}).where(eq(refreshTokens.token, token));
   respondWithJSON(res, 204, {});
+}
+
+export async function handlerUpdateUser(req: Request, res: Response){
+  type parameters = {
+    password: string;
+    email: string;
+  };
+  const params:parameters = req.body;
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.secret);
+  const hashPass = await hashPassword(params.password);
+  if (!hashPass){
+    throw new UnauthorizedError("Invalid email or password");
+  }
+  const [dbReturn] = await db.update(users).set({password: hashPass, email: params.email}).where(eq(users.id, userId)).returning();
+  if (!dbReturn){
+    throw new UnauthorizedError("Invalid email or password");
+  }
+  const updatedUser: UserResponse = {
+    id: dbReturn.id,
+    email: dbReturn.email,
+    createdAt: dbReturn.createdAt,
+    updatedAt: dbReturn.updatedAt,
+  }
+  respondWithJSON(res, 200, updatedUser);
 }
