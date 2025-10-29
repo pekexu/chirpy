@@ -187,3 +187,13 @@ export async function handlerUpdateUser(req: Request, res: Response){
   }
   respondWithJSON(res, 200, updatedUser);
 }
+
+export function getAPIKey(req: Request){
+  const apiKey = req.get("Authorization");
+
+  if (!apiKey) {
+    throw new UnauthorizedError("Invalid API Key");
+  }
+
+  return apiKey.substring(7).trim();
+}

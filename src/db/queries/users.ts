@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { db } from "../index.js";
 import { NewUser, UserResponse, users } from "../schema.js";
-import { BadRequestError, NotFoundError, respondWithJSON } from "../../api/errorhandler.js";
-import { hashPassword } from "../../api/auth.js";
+import { BadRequestError, NotFoundError, respondWithJSON, UnauthorizedError } from "../../api/errorhandler.js";
+import { getAPIKey, hashPassword } from "../../api/auth.js";
 import { eq } from "drizzle-orm";
+import { config } from "../../config.js";
 
 async function createUser(user: NewUser) {
   const [result] = await db
@@ -22,7 +23,10 @@ export async function handlerUpgradeUser(req: Request, res: Response){
     };
   };
   const params: parameters = req.body;
-  
+  const apiKey = getAPIKey(req);
+  if (apiKey !== config.api.polkaKey){
+    throw new UnauthorizedError("Invalid Api Key!");
+  }
   if (params.event !== "user.upgraded"){
     respondWithJSON(res, 204, {});
     return;
@@ -41,7 +45,6 @@ async function upgradeUser(userId: string){
   if (!user){
     throw new NotFoundError("Invalid username");
   }
-
   return user;
 }
 
