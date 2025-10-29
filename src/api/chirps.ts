@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { BadRequestError, ForbiddenError, NotFoundError, respondWithJSON, UnauthorizedError } from "./errorhandler.js";
 import { db } from "../db/index.js";
 import { chirps, NewChirp, users } from "../db/schema.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "../config.js";
 
@@ -33,11 +33,24 @@ export async function handlerGetAllChirps(req: Request, res: Response): Promise<
     if (typeof authorIdQuery === "string") {
         authorId = authorIdQuery;    
     }
-    if (authorId === ""){
-        allChirps = await db.select().from(chirps).orderBy(chirps.createdAt);
-    } else {
-        allChirps = await db.select().from(chirps).where(eq(chirps.userId, authorId)).orderBy(chirps.createdAt);
+    let sortOrder = "desc";
+    let orderQuery = req.query.sort;
+    if (typeof orderQuery === "string") {
+        sortOrder = orderQuery;
     }
+
+
+    if (authorId === ""){
+        allChirps = await db.select().from(chirps)/*.orderBy(chirps.createdAt)*/;
+    } else {
+        allChirps = await db.select().from(chirps).where(eq(chirps.userId, authorId))/*.orderBy(chirps.createdAt)*/;
+    }
+    if (sortOrder === "desc"){
+        
+        const changedList = allChirps.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+    
+
     respondWithJSON(res, 200, allChirps);
 }
 
