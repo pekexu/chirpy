@@ -1,10 +1,29 @@
 import { Request, Response } from "express";
-import { BadRequestError, respondWithJSON, UnauthorizedError } from "./errorhandler.js";
+import { BadRequestError, ForbiddenError, NotFoundError, respondWithJSON, UnauthorizedError } from "./errorhandler.js";
 import { db } from "../db/index.js";
 import { chirps, NewChirp, users } from "../db/schema.js";
-import { eq } from "drizzle-orm";
-import { getBearerToken, hashPassword, validateJWT } from "./auth.js";
+import { and, eq } from "drizzle-orm";
+import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "../config.js";
+
+export async function handlerDeleteChirp(req: Request, res: Response){
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.secret);
+    const chirpId = getChirpId(req);
+    
+    const [chirp] = await db.select().from(chirps).where(eq(chirps.id, chirpId));
+    if (!chirp) {
+        throw new NotFoundError("Chirp not found");
+    }
+    if (chirp.userId !== userId){
+        throw new ForbiddenError("Invalid user");
+    }
+    const [deletedChirp] = await db.delete(chirps).where(and(eq(chirps.id, chirpId), eq(chirps.userId, userId))).returning();
+    if (deletedChirp){
+        respondWithJSON(res, 204, {});
+    }
+}
+
 
 
 export async function handlerGetAllChirps(req: Request, res: Response): Promise<void>{
@@ -12,12 +31,20 @@ export async function handlerGetAllChirps(req: Request, res: Response): Promise<
     respondWithJSON(res, 200, allChirps);
 }
 
-export async function handlerGetChirps(req: Request, res: Response): Promise<void>{
+export function getChirpId(req: Request): string {
     const chirpId = req.params.chirpID;
     if (!chirpId){
         throw new BadRequestError("Invalid Chirp ID");
     }
+    return chirpId;
+}
+
+export async function handlerGetChirps(req: Request, res: Response): Promise<void>{
+    const chirpId = getChirpId(req);
     const [aChirp] = await db.select().from(chirps).where(eq(chirps.id, chirpId));
+    if (!aChirp){
+        throw new NotFoundError("Unable to find chirp");
+    }
     respondWithJSON(res, 200, aChirp);
 }
 
