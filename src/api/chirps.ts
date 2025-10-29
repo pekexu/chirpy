@@ -27,7 +27,17 @@ export async function handlerDeleteChirp(req: Request, res: Response){
 
 
 export async function handlerGetAllChirps(req: Request, res: Response): Promise<void>{
-    const allChirps = await db.select().from(chirps).orderBy(chirps.createdAt);
+    let allChirps;
+    let authorId = "";
+    let authorIdQuery = req.query.authorId;
+    if (typeof authorIdQuery === "string") {
+        authorId = authorIdQuery;    
+    }
+    if (authorId === ""){
+        allChirps = await db.select().from(chirps).orderBy(chirps.createdAt);
+    } else {
+        allChirps = await db.select().from(chirps).where(eq(chirps.userId, authorId)).orderBy(chirps.createdAt);
+    }
     respondWithJSON(res, 200, allChirps);
 }
 
