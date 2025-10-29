@@ -111,7 +111,8 @@ export async function handlerUserLogin(req: Request, res: Response){
     updatedAt: user.updatedAt,
     email: user.email,
     token: jwtToken,
-    refreshToken: refresh.token
+    refreshToken: refresh.token,
+    isChirpyRed: user.isChirpyRed,
   };
   respondWithJSON(res, 200, userRes);
 }
@@ -182,6 +183,7 @@ export async function handlerUpdateUser(req: Request, res: Response){
     email: dbReturn.email,
     createdAt: dbReturn.createdAt,
     updatedAt: dbReturn.updatedAt,
+    isChirpyRed: dbReturn.isChirpyRed,
   }
   respondWithJSON(res, 200, updatedUser);
 }

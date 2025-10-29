@@ -36,6 +36,13 @@
       "when": 1761652423511,
       "tag": "0004_petite_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1761727221492,
+      "tag": "0005_nifty_tag",
+      "breakpoints": true
     }
   ]
 }
